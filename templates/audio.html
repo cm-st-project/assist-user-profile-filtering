@@ -1,0 +1,26 @@
+<!doctype html>
+<title>Evaluate audio introduction</title>
+<img src="{{url_for('static', filename='audio_home.jpg')}}" align="Homepage" width=500 height=250/>
+<h2>Select audio to upload and evaluate</h2>
+<p>
+	{% with messages = get_flashed_messages() %}
+	  {% if messages %}
+		<ul class=flashes>
+		{% for message in messages %}
+		  <li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+	  {% endif %}
+	{% endwith %}
+</p>
+
+<form method="post" action="/audio" enctype="multipart/form-data">
+    <dl>
+		<p>
+			<input type="file" name="files[]" multiple="true" autocomplete="off" required>
+		</p>
+    </dl>
+    <p>
+		<input type="submit" value="Submit">
+	</p>
+</form>
