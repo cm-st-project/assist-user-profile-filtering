@@ -118,7 +118,7 @@ def evaluate_voice(audio_file, yamnet_model, audio_model):
     elif inferred_class == 0:
         return 0, 'Please reduce background noise and/or improve your audio quality.'
     else:
-        return 50, ''
+        return 20, ''
 
 
 # return a score of 0 to 100
@@ -129,13 +129,18 @@ def evaluate_audio(input_path, language_model, yamnet_model, audio_model):
     audio_file = format_audio(input_path)
     # transcribe
     text, duration = speech_recognition(audio_file)
+    duration_score = 0
     if duration < 3:
         return 10, 'Please talk about relevant skill/preference.'
+    elif duration > 10:
+        duration_score = 30
+    else:
+        duration_score = 30*(duration - 3)/(10 - 3)
 
     evaluate_keyword(text)
     text_score, text_reason = evaluate_text(text, language_model)
     audio_score, audio_reason = evaluate_voice(audio_file, yamnet_model, audio_model)
 
-    score = text_score + audio_score
+    score = round(text_score + audio_score + duration_score)
     reason = text_reason + audio_reason
     return text, score, reason

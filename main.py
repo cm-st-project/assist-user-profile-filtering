@@ -3,6 +3,8 @@ import os
 import tensorflow as tf
 import tensorflow_hub as hub
 from flask import flash, request, redirect, url_for, render_template
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from nudenet import NudeDetector
 from werkzeug.utils import secure_filename
 from transformers import *
@@ -11,6 +13,12 @@ from transformers import BertTokenizer, TFBertModel, BertConfig
 from app import app
 from image import evaluate_image
 from audio import evaluate_audio
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["100 per day"]
+)
 
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_AUDIO_EXTENSIONS = set(['wav', 'mp3', 'm4a'])
@@ -83,6 +91,7 @@ def audio_page():
 
 
 @app.route('/audio', methods=['POST'])
+@limiter.limit("100 per day")
 def upload_audio():
     if 'files[]' not in request.files:
         flash('No file part')
